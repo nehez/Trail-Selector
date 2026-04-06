@@ -420,6 +420,32 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .admin-del-btn  { flex-shrink: 0; padding: 7px 14px; font-size: 0.82rem; min-height: 34px; border-radius: 6px; color: #8b3210; }
 .admin-del-btn:hover:not(:disabled) { background: #fde8dc; }
 
+/* ── Test Mode Banner ─────────────────────────────────────── */
+#test-mode-banner {
+  background: #fef08a;
+  border-bottom: 2px solid #eab308;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #713f12;
+}
+#test-mode-banner-clear {
+  background: #eab308;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: auto;
+}
+#test-mode-banner-clear:hover { background: #ca8a04; }
+
 /* ── Test Mode Panel ──────────────────────────────────────── */
 #test-mode-btn {
   position: fixed;
