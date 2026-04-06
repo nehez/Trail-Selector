@@ -10,7 +10,7 @@ import { FIREBASE_CONFIG } from './firebase-config.js';
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
-const VERSION = 'v2.3';
+const VERSION = 'v2.4';
 
 // ── Test Mode ─────────────────────────────────────────────────
 function getEffectiveNow() {
@@ -350,7 +350,8 @@ function navigateToRuck(ruckId) {
 
 function navigateBack() {
   if (unsubscribeDetail) { unsubscribeDetail(); unsubscribeDetail = null; }
-  lastDetailData = { ruck: null, submissions: [], votes: [], attendees: [] };
+  // Keep ruck reference so test mode phase hint works from the list screen
+  lastDetailData = { ruck: lastDetailData.ruck, submissions: [], votes: [], attendees: [] };
   currentRuckId  = null;
   showScreen('list');
 }
@@ -655,7 +656,10 @@ function initTestMode() {
     if (testDate < phases.votingOpen)    status = 'submissions-open';
     else if (testDate < phases.closedAt) status = 'voting-open';
     else                                  status = 'closed';
-    hint.textContent = `→ ${STATUS_LABEL[status]} for this ruck`;
+    const nextDate = status === 'submissions-open' ? `· voting opens ${fmt(phases.votingOpen)}`
+                   : status === 'voting-open'      ? `· results start ${fmt(phases.closedAt)}`
+                   : '';
+    hint.textContent = `→ ${STATUS_LABEL[status]} ${nextDate}`;
   });
 
   function clearTestDate() {
