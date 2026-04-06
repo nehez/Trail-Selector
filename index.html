@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trail Selector</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Name Screen (first visit only) ───────────────────── -->
+  <div id="screen-name" class="screen">
+    <div class="container">
+      <h1>Trail Selector</h1>
+      <p>What's your name? This identifies your submissions and votes.</p>
+      <form id="name-form">
+        <input type="text" id="user-name-input" placeholder="Your name" required maxlength="50" autocomplete="off">
+        <button type="submit" class="btn-primary">Let's Go</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Ruck List ─────────────────────────────────────────── -->
+  <div id="screen-list" class="screen hidden">
+    <div class="container">
+      <div class="list-header">
+        <h1>Trail Selector</h1>
+        <button id="create-ruck-btn" class="btn-primary">+ New Ruck</button>
+      </div>
+      <div id="ruck-list"></div>
+    </div>
+  </div>
+
+  <!-- ── Create Ruck ───────────────────────────────────────── -->
+  <div id="screen-create" class="screen hidden">
+    <div class="container">
+      <h2>New Ruck</h2>
+      <form id="create-form">
+        <label for="ruck-name-input">Ruck Name</label>
+        <input type="text" id="ruck-name-input" placeholder="e.g. April Morning Ruck" required maxlength="80">
+        <label for="ruck-date-input">Ruck Date</label>
+        <input type="date" id="ruck-date-input" required>
+        <button type="submit" class="btn-primary">Create Ruck</button>
+        <button type="button" id="create-cancel" class="btn-secondary">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Ruck Detail ───────────────────────────────────────── -->
+  <div id="screen-detail" class="screen hidden">
+    <div class="container">
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

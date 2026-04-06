@@ -1,0 +1,272 @@
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #f2f2f2;
+  color: #1a1a1a;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.hidden { display: none !important; }
+
+h1 { font-size: 1.6rem; font-weight: 700; }
+h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 20px; }
+h3 { font-size: 0.95rem; font-weight: 600; color: #555; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ── Forms ────────────────────────────────────────────────── */
+form { display: flex; flex-direction: column; gap: 10px; }
+
+input[type="text"],
+input[type="url"],
+input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  color: #1a1a1a;
+}
+input:focus { outline: none; border-color: #4a80d4; }
+
+label { font-size: 0.85rem; font-weight: 500; color: #555; margin-bottom: -4px; }
+
+button {
+  cursor: pointer;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  min-height: 44px;
+  font-family: inherit;
+}
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-primary  { background: #4a80d4; color: #fff; font-weight: 600; }
+.btn-primary:hover:not(:disabled)  { background: #3a6ec0; }
+.btn-secondary { background: #e4e4e4; color: #333; }
+.btn-secondary:hover:not(:disabled) { background: #d4d4d4; }
+
+/* ── Name Screen ──────────────────────────────────────────── */
+#screen-name .container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 60px;
+}
+#screen-name h1 { margin-bottom: 4px; }
+#screen-name p  { color: #555; }
+
+/* ── Ruck List ────────────────────────────────────────────── */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.list-header h1 { margin: 0; }
+
+.ruck-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1.5px solid #e4e4e4;
+  transition: border-color 0.15s;
+  gap: 12px;
+}
+.ruck-card:hover { border-color: #4a80d4; }
+.ruck-card-main { min-width: 0; }
+.ruck-name { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ruck-date { font-size: 0.82rem; color: #777; margin-top: 2px; }
+
+/* ── Badges ───────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-upcoming          { background: #e4e4e4; color: #666; }
+.badge-submissions-open  { background: #fff3cd; color: #7a5800; }
+.badge-voting-open       { background: #d4edda; color: #1a6e2e; }
+.badge-closed            { background: #cfe2ff; color: #0a3879; }
+
+/* ── Create Ruck ──────────────────────────────────────────── */
+#screen-create .container { padding-top: 32px; }
+
+/* ── Detail Header ────────────────────────────────────────── */
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.back-btn {
+  background: none;
+  color: #4a80d4;
+  padding: 2px 0;
+  font-size: 0.92rem;
+  min-height: auto;
+  flex-shrink: 0;
+}
+.back-btn:hover { color: #3a6ec0; }
+.detail-title { flex: 1; min-width: 0; }
+.detail-name { font-size: 1.15rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.detail-date { font-size: 0.82rem; color: #777; margin-top: 2px; }
+
+/* ── Phase Box ────────────────────────────────────────────── */
+.phase-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 14px;
+  border: 1.5px solid #e4e4e4;
+}
+.phase-box > p { margin-bottom: 6px; color: #444; }
+.phase-box > p:last-child { margin-bottom: 0; }
+
+/* ── Submission List ──────────────────────────────────────── */
+.sub-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 4px;
+}
+.sub-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f7f7f7;
+  border-radius: 8px;
+}
+.sub-rank { font-size: 0.85rem; font-weight: 700; color: #aaa; width: 18px; text-align: center; flex-shrink: 0; }
+.sub-info { flex: 1; min-width: 0; }
+.sub-trail { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub-meta  { font-size: 0.78rem; color: #777; margin-top: 1px; }
+.sub-link  { color: #4a80d4; font-size: 0.78rem; margin-left: 4px; }
+.sub-votes { font-size: 0.85rem; font-weight: 600; color: #555; flex-shrink: 0; }
+
+/* ── Vote List ────────────────────────────────────────────── */
+.vote-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+.vote-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #f7f7f7;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+}
+.vote-item.voted { border-color: #4a80d4; background: #edf2fb; }
+.vote-info { flex: 1; min-width: 0; }
+.vote-trail { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vote-meta  { font-size: 0.78rem; color: #777; margin-top: 2px; }
+.vote-btn {
+  padding: 8px 14px;
+  min-height: 38px;
+  background: #e4e4e4;
+  color: #333;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+.vote-btn.active { background: #4a80d4; color: #fff; }
+.vote-btn:hover:not(:disabled) { opacity: 0.85; }
+
+/* ── Winner Box ───────────────────────────────────────────── */
+.winner-box {
+  background: #fffbea;
+  border: 2px solid #e8c840;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.winner-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #7a5800; margin-bottom: 6px; }
+.winner-name  { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+.winner-meta  { font-size: 0.85rem; color: #666; }
+.trail-link   { display: inline-block; margin-top: 10px; color: #4a80d4; font-weight: 600; font-size: 0.9rem; }
+.tie-note     { font-size: 0.75rem; color: #999; margin-top: 10px; font-style: italic; }
+
+/* ── Attendance ───────────────────────────────────────────── */
+.attendance {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px;
+  border: 1.5px solid #e4e4e4;
+}
+.attendance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.attendance-header h3 { margin: 0; }
+.count {
+  background: #e4e4e4;
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-left: 6px;
+  color: #555;
+}
+.attendance-btn {
+  padding: 8px 16px;
+  min-height: 38px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+}
+.attendance-btn.in  { background: #4a80d4; color: #fff; }
+.attendance-btn.out { background: #fde8e8; color: #a33; }
+.attendance-btn.in:hover  { background: #3a6ec0; }
+.attendance-btn.out:hover { background: #f8d4d4; }
+
+.attendee-list {
+  font-size: 0.9rem;
+  color: #444;
+  max-height: 150px;
+  overflow-y: auto;
+  line-height: 1.9;
+}
+
+/* ── Divider ──────────────────────────────────────────────── */
+.divider { height: 1px; background: #e4e4e4; margin: 14px 0; }
+
+/* ── Utility ──────────────────────────────────────────────── */
+.empty { color: #aaa; font-size: 0.9rem; padding: 6px 0; }
+.warn  { color: #c0392b; font-size: 0.85rem; }
+.hint  { color: #777; font-size: 0.8rem; margin-top: 8px; }
+
+a { color: #4a80d4; text-decoration: none; }
+a:hover { text-decoration: underline; }
