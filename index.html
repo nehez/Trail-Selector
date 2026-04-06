@@ -4,17 +4,49 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trail Selector</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ── Name Screen (first visit only) ───────────────────── -->
+  <!-- ── Name Screen ───────────────────────────────────────── -->
   <div id="screen-name" class="screen">
     <div class="container">
       <h1>Trail Selector</h1>
-      <p>What's your name? This identifies your submissions and votes.</p>
+      <p class="subtitle">What's your name? This identifies your submissions and votes.</p>
       <form id="name-form">
         <input type="text" id="user-name-input" placeholder="Your name" required maxlength="50" autocomplete="off">
+        <div>
+          <div class="emoji-picker-label">Pick your trail avatar (optional)</div>
+          <div class="emoji-picker">
+            <button type="button" class="emoji-option" data-emoji="🏔️">🏔️</button>
+            <button type="button" class="emoji-option" data-emoji="🥾">🥾</button>
+            <button type="button" class="emoji-option" data-emoji="🌲">🌲</button>
+            <button type="button" class="emoji-option" data-emoji="🦅">🦅</button>
+            <button type="button" class="emoji-option" data-emoji="🐻">🐻</button>
+            <button type="button" class="emoji-option" data-emoji="🏕️">🏕️</button>
+            <button type="button" class="emoji-option" data-emoji="🗺️">🗺️</button>
+            <button type="button" class="emoji-option" data-emoji="🧭">🧭</button>
+            <button type="button" class="emoji-option" data-emoji="⛰️">⛰️</button>
+            <button type="button" class="emoji-option" data-emoji="🌿">🌿</button>
+            <button type="button" class="emoji-option" data-emoji="💪">💪</button>
+            <button type="button" class="emoji-option" data-emoji="🎒">🎒</button>
+            <button type="button" class="emoji-option" data-emoji="🦌">🦌</button>
+            <button type="button" class="emoji-option" data-emoji="🪨">🪨</button>
+            <button type="button" class="emoji-option" data-emoji="🌄">🌄</button>
+            <button type="button" class="emoji-option" data-emoji="🏞️">🏞️</button>
+            <button type="button" class="emoji-option" data-emoji="🐺">🐺</button>
+            <button type="button" class="emoji-option" data-emoji="🦊">🦊</button>
+            <button type="button" class="emoji-option" data-emoji="🌙">🌙</button>
+            <button type="button" class="emoji-option" data-emoji="⚡">⚡</button>
+            <button type="button" class="emoji-option" data-emoji="🔥">🔥</button>
+            <button type="button" class="emoji-option" data-emoji="🪵">🪵</button>
+            <button type="button" class="emoji-option" data-emoji="🏋️">🏋️</button>
+            <button type="button" class="emoji-option" data-emoji="🐗">🐗</button>
+          </div>
+        </div>
         <button type="submit" class="btn-primary">Let's Go</button>
       </form>
     </div>
@@ -50,6 +82,18 @@
   <div id="screen-detail" class="screen hidden">
     <div class="container">
       <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ── Test Mode ─────────────────────────────────────────── -->
+  <button id="test-mode-btn" title="Test mode — simulate a different date">⚙</button>
+  <div id="test-mode-panel" class="hidden">
+    <h3>Test Mode</h3>
+    <p class="hint">Simulate "today" as a different date to preview phases.</p>
+    <div class="test-panel-row">
+      <input type="date" id="test-date-input">
+      <button id="test-date-set" class="btn-primary">Set</button>
+      <button id="test-date-clear" class="btn-secondary">Clear</button>
     </div>
   </div>
 
