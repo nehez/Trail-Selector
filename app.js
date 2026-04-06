@@ -451,5 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('app-version').textContent = VERSION;
+  document.title = `Trail Selector ${VERSION}`;
   getOrCreateUser();
 });
