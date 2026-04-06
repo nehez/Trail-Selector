@@ -1,10 +1,10 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { initializeApp } from 'https://esm.sh/firebase@10/app';
 import {
   getFirestore, collection, doc,
   addDoc, setDoc, deleteDoc,
   onSnapshot, query, orderBy,
   serverTimestamp
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+} from 'https://esm.sh/firebase@10/firestore';
 import { FIREBASE_CONFIG } from './firebase-config.js';
 
 const app = initializeApp(FIREBASE_CONFIG);
