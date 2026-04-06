@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "ruck-map-vote",
     "public": ".",
     "ignore": [
       "firebase.json",
