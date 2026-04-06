@@ -10,7 +10,7 @@ import { FIREBASE_CONFIG } from './firebase-config.js';
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
-const VERSION = 'v2.1';
+const VERSION = 'v2.2';
 
 // ── Test Mode ─────────────────────────────────────────────────
 function getEffectiveNow() {
@@ -100,21 +100,42 @@ async function fetchTrailPreview(url) {
   if (!url) return null;
   const key    = 'preview_' + url;
   const cached = sessionStorage.getItem(key);
-  if (cached) return JSON.parse(cached);
+  if (cached) return JSON.parse(cached); // only stored when image was found
+
+  // Strategy 1: extract og:image via CORS proxy — works for AllTrails (OG tags are server-rendered)
   try {
-    const res     = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
-    const json    = await res.json();
-    const image   = json.data?.image?.url
-                 || json.data?.screenshot?.url
-                 || json.data?.logo?.url
-                 || null;
-    const preview = { image, title: json.data?.title || null };
-    sessionStorage.setItem(key, JSON.stringify(preview));
-    return preview;
+    const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`,
+                            { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const html  = await res.text();
+      const image = (html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i)
+                  || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i))
+                  ?.[1] || null;
+      const title = (html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i))
+                  ?.[1] || null;
+      if (image) {
+        const preview = { image, title };
+        sessionStorage.setItem(key, JSON.stringify(preview));
+        return preview;
+      }
+    }
+  } catch { /* fall through to next strategy */ }
+
+  // Strategy 2: microlink.io fallback
+  try {
+    const res   = await fetch(`https://api.microlink.io?url=${encodeURIComponent(url)}`);
+    const json  = await res.json();
+    const image = json.data?.image?.url || json.data?.screenshot?.url || null;
+    if (image) {
+      const preview = { image, title: json.data?.title || null };
+      sessionStorage.setItem(key, JSON.stringify(preview));
+      return preview;
+    }
   } catch (err) {
-    console.warn('Trail preview fetch failed:', err);
-    return null;
+    console.warn('Trail preview failed:', err);
   }
+
+  return null; // do NOT cache null — allow retry on next render
 }
 
 function attachPreview(url, containerId) {
@@ -147,7 +168,7 @@ async function getWinnerForRuck(ruckId) {
     const tally = tallyVotes(subs, votes);
     const w     = tally[0] || null;
     const result = w ? { trailName: w.trailName, trailLink: w.trailLink || null } : null;
-    sessionStorage.setItem(cacheKey, JSON.stringify(result));
+    if (result) sessionStorage.setItem(cacheKey, JSON.stringify(result)); // don't cache null
     return result;
   } catch { return null; }
 }
@@ -628,6 +649,8 @@ function initTestMode() {
     localStorage.setItem('testDate', input.value + 'T12:00:00');
     panel.classList.add('hidden');
     hint.textContent = '';
+    // Clear winner caches so newly-closed rucks re-fetch fresh winner data
+    Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
     // Re-render detail directly from cached data (no re-subscription timing issues)
     const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
     if (onDetail && lastDetailData.ruck) {
@@ -642,6 +665,8 @@ function initTestMode() {
     input.value = '';
     hint.textContent = '';
     panel.classList.add('hidden');
+    // Clear winner caches so phases revert cleanly
+    Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
     const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
     if (onDetail && lastDetailData.ruck) {
       renderRuckDetail(lastDetailData.ruck, lastDetailData.submissions, lastDetailData.votes, lastDetailData.attendees);
