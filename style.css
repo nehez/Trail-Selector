@@ -38,6 +38,19 @@ h3 {
   margin-bottom: 10px;
 }
 
+/* Version tag inside h1 */
+.version-tag {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9a9080;
+  background: #e8e2d4;
+  border-radius: 10px;
+  padding: 2px 8px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
 /* ── Forms ────────────────────────────────────────────────── */
 form { display: flex; flex-direction: column; gap: 10px; }
 
@@ -112,7 +125,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   min-height: auto;
   padding: 0;
 }
-.emoji-option:hover   { border-color: #3a7d44; transform: scale(1.08); }
+.emoji-option:hover    { border-color: #3a7d44; transform: scale(1.08); }
 .emoji-option.selected { border-color: #3a7d44; background: #eaf2ec; transform: scale(1.08); }
 
 /* ── Ruck List ────────────────────────────────────────────── */
@@ -122,7 +135,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   justify-content: space-between;
   margin-bottom: 24px;
 }
-.list-header h1 { margin: 0; }
+.list-header h1, .list-header h2 { margin: 0; }
 
 .ruck-card {
   display: flex;
@@ -152,6 +165,18 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 .ruck-name { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ruck-date { font-size: 0.82rem; color: #9a9080; margin-top: 2px; }
 .ruck-card .badge { margin-right: 14px; flex-shrink: 0; }
+
+/* Winner line on closed rucks in list */
+.list-winner {
+  font-size: 0.8rem;
+  color: #d4622a;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.list-winner a { color: inherit; margin-left: 3px; }
 
 /* ── Badges ───────────────────────────────────────────────── */
 .badge {
@@ -211,15 +236,6 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   box-shadow: 0 2px 8px rgba(44,41,22,0.07);
 }
 
-/* ── Timeline ─────────────────────────────────────────────── */
-.timeline { display: flex; flex-direction: column; gap: 10px; }
-.tl-row   { display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem; }
-.tl-label { color: #5a5040; }
-.tl-date  { font-weight: 700; color: #3a7d44; font-size: 0.9rem; }
-.tl-ruck  { margin-top: 6px; padding-top: 12px; border-top: 1px solid #ece6d8; font-weight: 700; font-size: 1rem; }
-.tl-ruck .tl-label { font-size: 1rem; }
-.tl-ruck .tl-date  { color: #d4622a; font-size: 1rem; }
-
 /* ── Trail Preview ────────────────────────────────────────── */
 .trail-preview-img {
   width: 100%;
@@ -262,7 +278,7 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-height: 420px;
+  max-height: 360px;
   overflow-y: auto;
 }
 .vote-item {
@@ -381,6 +397,29 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   cursor: default;
 }
 
+/* ── Admin Panel ──────────────────────────────────────────── */
+.admin-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 4px rgba(44,41,22,0.08);
+}
+.admin-row-info { flex: 1; min-width: 0; }
+.admin-row-name { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-row-sub  { font-size: 0.72rem; color: #b8ae98; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-del-btn  { flex-shrink: 0; padding: 7px 14px; font-size: 0.82rem; min-height: 34px; border-radius: 6px; color: #8b3210; }
+.admin-del-btn:hover:not(:disabled) { background: #fde8dc; }
+
 /* ── Test Mode Panel ──────────────────────────────────────── */
 #test-mode-btn {
   position: fixed;
@@ -408,10 +447,11 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   padding: 16px;
   z-index: 100;
   box-shadow: 0 6px 24px rgba(0,0,0,0.14);
-  min-width: 250px;
+  min-width: 260px;
 }
 #test-mode-panel h3 { margin-bottom: 6px; }
-#test-mode-panel .hint { margin-top: 0; margin-bottom: 10px; }
+#test-mode-panel .hint { margin-top: 0; margin-bottom: 6px; }
+.test-phase-hint { color: #3a7d44 !important; font-weight: 600; min-height: 1.2em; }
 .test-panel-row { display: flex; gap: 6px; }
 .test-panel-row input[type="date"] { flex: 1; font-size: 0.85rem; padding: 8px 10px; min-height: 0; }
 .test-panel-row button { padding: 8px 12px; font-size: 0.82rem; min-height: 36px; border-radius: 6px; }
@@ -431,8 +471,9 @@ a:hover { text-decoration: underline; }
   position: fixed;
   bottom: 10px;
   right: 12px;
-  font-size: 0.7rem;
-  color: #c0b8a4;
-  pointer-events: none;
+  font-size: 0.75rem;
+  color: #b8ae98;
   z-index: 100;
+  cursor: default;
+  user-select: none;
 }
