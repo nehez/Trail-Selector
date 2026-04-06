@@ -14,7 +14,7 @@
   <!-- ── Name Screen ───────────────────────────────────────── -->
   <div id="screen-name" class="screen">
     <div class="container">
-      <h1>Trail Selector</h1>
+      <h1>Trail Selector <span class="version-tag"></span></h1>
       <p class="subtitle">What's your name? This identifies your submissions and votes.</p>
       <form id="name-form">
         <input type="text" id="user-name-input" placeholder="Your name" required maxlength="50" autocomplete="off">
@@ -56,7 +56,7 @@
   <div id="screen-list" class="screen hidden">
     <div class="container">
       <div class="list-header">
-        <h1>Trail Selector</h1>
+        <h1>Trail Selector <span class="version-tag"></span></h1>
         <button id="create-ruck-btn" class="btn-primary">+ New Ruck</button>
       </div>
       <div id="ruck-list"></div>
@@ -85,11 +85,24 @@
     </div>
   </div>
 
+  <!-- ── Admin Panel ───────────────────────────────────────── -->
+  <div id="screen-admin" class="screen hidden">
+    <div class="container">
+      <div class="list-header">
+        <h2>Admin Panel</h2>
+        <button id="admin-back-btn" class="btn-secondary">← Back</button>
+      </div>
+      <p class="hint" style="margin-bottom:16px">Deleting a ruck removes it and all its submissions, votes, and RSVPs. Deleting a user keeps their trail data.</p>
+      <div id="admin-user-list"></div>
+    </div>
+  </div>
+
   <!-- ── Test Mode ─────────────────────────────────────────── -->
   <button id="test-mode-btn" title="Test mode — simulate a different date">⚙</button>
   <div id="test-mode-panel" class="hidden">
     <h3>Test Mode</h3>
     <p class="hint">Simulate "today" as a different date to preview phases.</p>
+    <p id="test-phase-hint" class="hint test-phase-hint"></p>
     <div class="test-panel-row">
       <input type="date" id="test-date-input">
       <button id="test-date-set" class="btn-primary">Set</button>

@@ -3,24 +3,23 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     match /users/{userId} {
-      allow read, create: if true;
-      allow update, delete: if false;
+      allow read, create, delete: if true;
+      allow update: if false;
     }
 
     match /rucks/{ruckId} {
-      allow read, create: if true;
-      allow update, delete: if false;
+      allow read, create, delete: if true;
+      allow update: if false;
     }
 
     match /rucks/{ruckId}/submissions/{subId} {
-      allow read, create: if true;
-      allow update, delete: if false;
+      allow read, create, delete: if true;
+      allow update: if false;
     }
 
     // setDoc (create or overwrite) is used for votes — needs create + update
     match /rucks/{ruckId}/votes/{userId} {
-      allow read, create, update: if true;
-      allow delete: if false;
+      allow read, create, update, delete: if true;
     }
 
     // Attendance can be toggled off, so delete is allowed
