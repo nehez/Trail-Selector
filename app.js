@@ -383,6 +383,17 @@ function renderAttendance(attendees, isAttending) {
     </div>`;
 }
 
+// ── Error Display ─────────────────────────────────────────────
+function showError(err) {
+  console.error(err);
+  const msg = err?.code === 'permission-denied'
+    ? 'Firestore permission denied. Make sure the database exists in Firebase Console and is in test mode.'
+    : err?.code === 'unavailable' || err?.message?.includes('fetch')
+    ? 'Cannot reach Firebase. Check your internet connection.'
+    : `Error: ${err?.message || err}`;
+  alert(msg);
+}
+
 // ── Utility ───────────────────────────────────────────────────
 function esc(str) {
   if (!str) return '';
@@ -402,7 +413,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!name) return;
     const btn = e.target.querySelector('button');
     btn.disabled = true;
-    await saveUser(name);
+    try {
+      await saveUser(name);
+    } catch (err) {
+      showError(err);
+      btn.disabled = false;
+    }
   });
 
   // Create ruck form
@@ -413,10 +429,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!name || !date) return;
     const btn = e.target.querySelector('button[type="submit"]');
     btn.disabled = true;
-    await createRuck(name, date);
-    e.target.reset();
+    try {
+      await createRuck(name, date);
+      e.target.reset();
+      showScreen('list');
+    } catch (err) {
+      showError(err);
+    }
     btn.disabled = false;
-    showScreen('list');
   });
 
   document.getElementById('create-cancel').addEventListener('click', () => showScreen('list'));
