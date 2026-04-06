@@ -10,6 +10,8 @@ import { FIREBASE_CONFIG } from './firebase-config.js';
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
+const VERSION = 'v1.0';
+
 // ── State ────────────────────────────────────────────────────
 let currentUser      = null;   // { userId, userName }
 let currentRuckId    = null;
@@ -74,6 +76,7 @@ async function saveUser(name) {
 function initApp() {
   subscribeToRucks();
   showScreen('list');
+  document.getElementById('app-version').textContent = VERSION;
 }
 
 // ── Firestore: Reads ──────────────────────────────────────────
