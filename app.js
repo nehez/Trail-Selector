@@ -76,7 +76,6 @@ async function saveUser(name) {
 function initApp() {
   subscribeToRucks();
   showScreen('list');
-  document.getElementById('app-version').textContent = VERSION;
 }
 
 // ── Firestore: Reads ──────────────────────────────────────────
@@ -451,5 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('create');
   });
 
+  document.getElementById('app-version').textContent = VERSION;
   getOrCreateUser();
 });
