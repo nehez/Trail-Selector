@@ -270,3 +270,10 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
 
 a { color: #4a80d4; text-decoration: none; }
 a:hover { text-decoration: underline; }
+
+#app-version {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #bbb;
+  margin-top: 32px;
+}
