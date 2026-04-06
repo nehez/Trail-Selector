@@ -10,7 +10,7 @@ import { FIREBASE_CONFIG } from './firebase-config.js';
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
-const VERSION = 'v2.2';
+const VERSION = 'v2.3';
 
 // ── Test Mode ─────────────────────────────────────────────────
 function getEffectiveNow() {
@@ -192,6 +192,20 @@ async function saveUser(name, emoji) {
   currentUser = { userId: ref.id, userName: name, emoji: emoji || null };
   localStorage.setItem('ruckUser', JSON.stringify(currentUser));
   initApp();
+}
+
+// ── Test Mode Banner ──────────────────────────────────────────
+function updateTestBanner() {
+  const stored  = localStorage.getItem('testDate');
+  const banner  = document.getElementById('test-mode-banner');
+  const text    = document.getElementById('test-mode-banner-text');
+  if (stored) {
+    const d = new Date(stored);
+    text.textContent = `⚠ TEST MODE — simulating ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
 }
 
 // ── App Init ──────────────────────────────────────────────────
@@ -644,35 +658,37 @@ function initTestMode() {
     hint.textContent = `→ ${STATUS_LABEL[status]} for this ruck`;
   });
 
+  function clearTestDate() {
+    localStorage.removeItem('testDate');
+    input.value = '';
+    hint.textContent = '';
+    panel.classList.add('hidden');
+    Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
+    updateTestBanner();
+    const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
+    if (onDetail && lastDetailData.ruck) {
+      renderRuckDetail(lastDetailData.ruck, lastDetailData.submissions, lastDetailData.votes, lastDetailData.attendees);
+    }
+    subscribeToRucks();
+  }
+
   setBtn.addEventListener('click', () => {
     if (!input.value) return;
     localStorage.setItem('testDate', input.value + 'T12:00:00');
     panel.classList.add('hidden');
     hint.textContent = '';
-    // Clear winner caches so newly-closed rucks re-fetch fresh winner data
     Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
-    // Re-render detail directly from cached data (no re-subscription timing issues)
+    updateTestBanner();
     const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
     if (onDetail && lastDetailData.ruck) {
       renderRuckDetail(lastDetailData.ruck, lastDetailData.submissions, lastDetailData.votes, lastDetailData.attendees);
     }
-    // Always refresh the list too
     subscribeToRucks();
   });
 
-  clearBtn.addEventListener('click', () => {
-    localStorage.removeItem('testDate');
-    input.value = '';
-    hint.textContent = '';
-    panel.classList.add('hidden');
-    // Clear winner caches so phases revert cleanly
-    Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
-    const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
-    if (onDetail && lastDetailData.ruck) {
-      renderRuckDetail(lastDetailData.ruck, lastDetailData.submissions, lastDetailData.votes, lastDetailData.attendees);
-    }
-    subscribeToRucks();
-  });
+  clearBtn.addEventListener('click', clearTestDate);
+
+  document.getElementById('test-mode-banner-clear').addEventListener('click', clearTestDate);
 }
 
 // ── Error Display ─────────────────────────────────────────────
@@ -700,6 +716,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.title = `Trail Selector ${VERSION}`;
 
   initTestMode();
+  updateTestBanner();
 
   // Admin easter egg: tap version badge 5× quickly
   let adminTaps = 0, adminTimer = null;
