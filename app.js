@@ -10,13 +10,7 @@ import { FIREBASE_CONFIG } from './firebase-config.js';
 const app = initializeApp(FIREBASE_CONFIG);
 const db  = getFirestore(app);
 
-const VERSION = 'v2.4';
-
-// ── Test Mode ─────────────────────────────────────────────────
-function getEffectiveNow() {
-  const stored = localStorage.getItem('testDate');
-  return stored ? new Date(stored) : new Date();
-}
+const VERSION = 'v2.5';
 
 // ── State ─────────────────────────────────────────────────────
 let currentUser       = null;
@@ -64,8 +58,11 @@ function getRuckPhases(ruckDate, createdAt) {
 
 // Submissions are always open from creation until 'closed'.
 // No 'upcoming' phase — submit trails at any time before results.
+// testPhase in localStorage forces a specific phase (test mode).
 function getRuckStatus(ruckDate, createdAt) {
-  const now    = getEffectiveNow();
+  const forced = localStorage.getItem('testPhase');
+  if (forced) return forced;
+  const now    = new Date();
   const phases = getRuckPhases(ruckDate, createdAt);
   if (now < phases.votingOpen) return 'submissions-open';
   if (now < phases.closedAt)   return 'voting-open';
@@ -196,12 +193,11 @@ async function saveUser(name, emoji) {
 
 // ── Test Mode Banner ──────────────────────────────────────────
 function updateTestBanner() {
-  const stored  = localStorage.getItem('testDate');
-  const banner  = document.getElementById('test-mode-banner');
-  const text    = document.getElementById('test-mode-banner-text');
-  if (stored) {
-    const d = new Date(stored);
-    text.textContent = `⚠ TEST MODE — simulating ${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+  const phase  = localStorage.getItem('testPhase');
+  const banner = document.getElementById('test-mode-banner');
+  const text   = document.getElementById('test-mode-banner-text');
+  if (phase) {
+    text.textContent = `⚠ TEST MODE — forcing ${STATUS_LABEL[phase]}`;
     banner.classList.remove('hidden');
   } else {
     banner.classList.add('hidden');
@@ -276,13 +272,14 @@ async function createRuck(name, dateStr) {
   });
 }
 
-async function submitTrail(ruckId, trailName, trailLink) {
+async function submitTrail(ruckId, trailName, trailLink, trailImageUrl) {
   await addDoc(collection(db, 'rucks', ruckId, 'submissions'), {
-    userId:      currentUser.userId,
-    userName:    currentUser.userName,
+    userId:        currentUser.userId,
+    userName:      currentUser.userName,
     trailName,
-    trailLink:   trailLink || '',
-    submittedAt: serverTimestamp(),
+    trailLink:     trailLink || '',
+    trailImageUrl: trailImageUrl || '',
+    submittedAt:   serverTimestamp(),
   });
 }
 
@@ -403,7 +400,7 @@ function renderRuckDetail(ruck, submissions, votes, attendees) {
   const myVote      = votes.find(v => v.userId === currentUser.userId);
   const mySubs      = submissions.filter(s => s.userId === currentUser.userId);
   const isAttending = attendees.some(a => a.userId === currentUser.userId);
-  const testMode    = !!localStorage.getItem('testDate');
+  const testMode    = !!localStorage.getItem('testPhase');
 
   document.getElementById('detail-content').innerHTML = `
     <div class="detail-header">
@@ -428,13 +425,14 @@ function renderRuckDetail(ruck, submissions, votes, attendees) {
   if (status === 'submissions-open' || status === 'voting-open') {
     document.getElementById('submit-form')?.addEventListener('submit', async e => {
       e.preventDefault();
-      const name = document.getElementById('trail-name').value.trim();
-      const link = document.getElementById('trail-link').value.trim();
+      const name     = document.getElementById('trail-name').value.trim();
+      const link     = document.getElementById('trail-link').value.trim();
+      const imageUrl = document.getElementById('trail-image-url')?.value.trim();
       if (!name) return;
       const btn = e.target.querySelector('button[type="submit"]');
       btn.disabled = true;
       try {
-        await submitTrail(currentRuckId, name, link);
+        await submitTrail(currentRuckId, name, link, imageUrl);
         e.target.reset();
       } catch (err) { showError(err); }
       btn.disabled = false;
@@ -451,9 +449,18 @@ function renderRuckDetail(ruck, submissions, votes, attendees) {
     toggleAttendance(currentRuckId, isAttending)
   );
 
-  // Lazy-load trail previews
-  document.querySelectorAll('[data-preview-url]').forEach(el => {
-    attachPreview(el.dataset.previewUrl, el.dataset.previewId);
+  // Load trail previews — direct image URL takes priority, else try OG fetch
+  document.querySelectorAll('[data-preview-id]').forEach(el => {
+    if (el.dataset.directImg) {
+      const img     = document.createElement('img');
+      img.className = 'trail-preview-img';
+      img.alt       = 'Trail photo';
+      img.onload    = () => img.classList.add('loaded');
+      img.src       = el.dataset.directImg;
+      el.prepend(img);
+    } else if (el.dataset.previewUrl) {
+      attachPreview(el.dataset.previewUrl, el.id);
+    }
   });
 }
 
@@ -466,6 +473,7 @@ function renderPhase(status, date, tally, myVote, mySubs, rawSubmissions, phases
     <form id="submit-form">
       <input type="text" id="trail-name" placeholder="Trail name" required maxlength="100" ${overLimit ? 'disabled' : ''}>
       <input type="url"  id="trail-link" placeholder="AllTrails link (optional)">
+      <input type="url"  id="trail-image-url" placeholder="Photo URL (optional — paste any image link)">
       <button type="submit" class="btn-primary" ${overLimit ? 'disabled' : ''}>Submit Trail</button>
     </form>`;
 
@@ -487,7 +495,9 @@ function renderPhase(status, date, tally, myVote, mySubs, rawSubmissions, phases
           ${tally.map(s => {
             const voted    = myVote?.submissionId === s.id;
             const prevId   = `prev-${s.id}`;
-            const prevAttrs = s.trailLink ? `data-preview-url="${esc(s.trailLink)}" data-preview-id="${prevId}"` : '';
+            const prevAttrs = s.trailImageUrl
+              ? `data-preview-id="${prevId}" data-direct-img="${esc(s.trailImageUrl)}"`
+              : s.trailLink ? `data-preview-url="${esc(s.trailLink)}" data-preview-id="${prevId}"` : '';
             return `
               <div class="vote-item ${voted ? 'voted' : ''}">
                 <div class="vote-card-body" id="${prevId}" ${prevAttrs}>
@@ -510,7 +520,9 @@ function renderPhase(status, date, tally, myVote, mySubs, rawSubmissions, phases
   const winner = tally[0];
   const isTied = tally.length > 1 && winner && tally[1].voteCount === winner.voteCount;
   const winId  = 'winner-preview';
-  const winAttrs = winner?.trailLink ? `data-preview-url="${esc(winner.trailLink)}" data-preview-id="${winId}"` : '';
+  const winAttrs = winner?.trailImageUrl
+    ? `data-preview-id="${winId}" data-direct-img="${esc(winner.trailImageUrl)}"`
+    : winner?.trailLink ? `data-preview-url="${esc(winner.trailLink)}" data-preview-id="${winId}"` : '';
   return `
     <div class="phase-box">
       <h3>Results</h3>
@@ -535,7 +547,9 @@ function renderSubList(submissions, showVotes) {
   if (!submissions.length) return '<p class="empty">None yet.</p>';
   return `<div class="sub-list">${submissions.map((s, i) => {
     const prevId    = `sub-prev-${s.id || i}`;
-    const prevAttrs = s.trailLink ? `data-preview-url="${esc(s.trailLink)}" data-preview-id="${prevId}"` : '';
+    const prevAttrs = s.trailImageUrl
+      ? `data-preview-id="${prevId}" data-direct-img="${esc(s.trailImageUrl)}"`
+      : s.trailLink ? `data-preview-url="${esc(s.trailLink)}" data-preview-id="${prevId}"` : '';
     return `
       <div class="sub-item">
         ${showVotes ? `<div class="sub-rank">${i + 1}</div>` : ''}
@@ -635,39 +649,22 @@ async function renderAdminPanel() {
 
 // ── Test Mode Panel ───────────────────────────────────────────
 function initTestMode() {
-  const btn      = document.getElementById('test-mode-btn');
-  const panel    = document.getElementById('test-mode-panel');
-  const input    = document.getElementById('test-date-input');
-  const setBtn   = document.getElementById('test-date-set');
-  const clearBtn = document.getElementById('test-date-clear');
-  const hint     = document.getElementById('test-phase-hint');
+  // Migrate away from legacy testDate (replaced by testPhase in v2.5)
+  localStorage.removeItem('testDate');
 
-  const stored = localStorage.getItem('testDate');
-  if (stored) input.value = stored.split('T')[0];
+  const btn   = document.getElementById('test-mode-btn');
+  const panel = document.getElementById('test-mode-panel');
 
   btn.addEventListener('click', () => panel.classList.toggle('hidden'));
 
-  // Live phase preview as user types a test date
-  input.addEventListener('input', () => {
-    if (!input.value || !lastDetailData.ruck) { hint.textContent = ''; return; }
-    const testDate = new Date(input.value + 'T12:00:00');
-    const phases   = getRuckPhases(lastDetailData.ruck.ruckDate, lastDetailData.ruck.createdAt);
-    let status;
-    if (testDate < phases.votingOpen)    status = 'submissions-open';
-    else if (testDate < phases.closedAt) status = 'voting-open';
-    else                                  status = 'closed';
-    const nextDate = status === 'submissions-open' ? `· voting opens ${fmt(phases.votingOpen)}`
-                   : status === 'voting-open'      ? `· results start ${fmt(phases.closedAt)}`
-                   : '';
-    hint.textContent = `→ ${STATUS_LABEL[status]} ${nextDate}`;
-  });
-
-  function clearTestDate() {
-    localStorage.removeItem('testDate');
-    input.value = '';
-    hint.textContent = '';
+  function applyPhase(phase) {
     panel.classList.add('hidden');
     Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
+    if (phase === 'real') {
+      localStorage.removeItem('testPhase');
+    } else {
+      localStorage.setItem('testPhase', phase);
+    }
     updateTestBanner();
     const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
     if (onDetail && lastDetailData.ruck) {
@@ -676,23 +673,11 @@ function initTestMode() {
     subscribeToRucks();
   }
 
-  setBtn.addEventListener('click', () => {
-    if (!input.value) return;
-    localStorage.setItem('testDate', input.value + 'T12:00:00');
-    panel.classList.add('hidden');
-    hint.textContent = '';
-    Object.keys(sessionStorage).filter(k => k.startsWith('winner_')).forEach(k => sessionStorage.removeItem(k));
-    updateTestBanner();
-    const onDetail = !document.getElementById('screen-detail').classList.contains('hidden');
-    if (onDetail && lastDetailData.ruck) {
-      renderRuckDetail(lastDetailData.ruck, lastDetailData.submissions, lastDetailData.votes, lastDetailData.attendees);
-    }
-    subscribeToRucks();
+  document.querySelectorAll('.test-phase-btn').forEach(b => {
+    b.addEventListener('click', () => applyPhase(b.dataset.phase));
   });
 
-  clearBtn.addEventListener('click', clearTestDate);
-
-  document.getElementById('test-mode-banner-clear').addEventListener('click', clearTestDate);
+  document.getElementById('test-mode-banner-clear').addEventListener('click', () => applyPhase('real'));
 }
 
 // ── Error Display ─────────────────────────────────────────────

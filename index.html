@@ -102,15 +102,15 @@
   </div>
 
   <!-- ── Test Mode ─────────────────────────────────────────── -->
-  <button id="test-mode-btn" title="Test mode — simulate a different date">⚙</button>
+  <button id="test-mode-btn" title="Test mode — force a phase">⚙</button>
   <div id="test-mode-panel" class="hidden">
     <h3>Test Mode</h3>
-    <p class="hint">Simulate "today" as a different date to preview phases.</p>
-    <p id="test-phase-hint" class="hint test-phase-hint"></p>
-    <div class="test-panel-row">
-      <input type="date" id="test-date-input">
-      <button id="test-date-set" class="btn-primary">Set</button>
-      <button id="test-date-clear" class="btn-secondary">Clear</button>
+    <p class="hint">Force a phase to preview how the app looks.</p>
+    <div class="test-phase-btns">
+      <button class="test-phase-btn" data-phase="submissions-open">📋 Submit</button>
+      <button class="test-phase-btn" data-phase="voting-open">🗳️ Vote</button>
+      <button class="test-phase-btn" data-phase="closed">🏆 Results</button>
+      <button class="test-phase-btn test-phase-real" data-phase="real">Real Dates</button>
     </div>
   </div>
 
